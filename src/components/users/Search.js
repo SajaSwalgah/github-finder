@@ -1,39 +1,35 @@
-import React, { Component } from 'react'
+import React, { useState, useContext } from 'react'
+import { GithubContext } from '../../context/github/githubContext.js'
+import { AlertContext } from '../../context/alert/AlertContext.js'
 
-export class Search extends Component {
-    state = {
-        text: '',
+const Search = (props) => {
+    const githubContext = useContext(GithubContext)
+    const alertContext = useContext(AlertContext);
+    const [text, setText] = useState('')
+    const changeHandler = (event) => {
+        setText(event.target.value)
     }
 
-    changeHandler = (event) => {
-        this.setState({ [event.target.name]: event.target.value })
-    }
-
-    submit = (e) => {
+    const submit = (e) => {
         e.preventDefault();
-        if (this.state.text === '') {
-            this.props.alert('Please enter search query', 'warning')
+        if (text === '') {
+            alertContext.setAlert('Please enter search query', 'warning')
         } else {
-            
-            this.props.searchUser(this.state.text)
-            this.setState({ text: '' })
+            githubContext.searchUser(text)
+            setText('')
         }
-
     }
+    return (
+        <div>
+            <form className="form" onSubmit={submit}>
+                <input type="text" name="text" placeholder="Search Users..." value={text} onChange={changeHandler} />
+                <input type="submit" value="Search" className="btn btn-dark btn-block" />
+                {githubContext.users.length > 0 && <button className="btn btn-light btn-block" onClick={githubContext.clearSearch} >Clear</button>
+                }
+            </form>
+        </div>
+    )
 
-    render() {
-        return (
-            <div>
-                <form className="form" onSubmit={this.submit}>
-                    <input type="text" name="text" placeholder="Search Users..." value={this.state.text} onChange={this.changeHandler} />
-                    <input type="submit" value="Search" className="btn btn-dark btn-block" />
-                    {this.props.showClear && <button className="btn btn-light btn-block" onClick={this.props.clearSearch} >Clear</button>
-                    }
-                </form>
-
-            </div>
-        )
-    }
 }
 
 export default Search
